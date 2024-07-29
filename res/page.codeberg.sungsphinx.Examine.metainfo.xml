@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>page.codeberg.sungsphinx.Examine</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <project_group>COSMIC</project_group>
+  <developer_name>Dexter Reed</developer_name>
+  <update_contact>dreed4470@proton.me</update_contact>
+  <url type="homepage">https://github.com/sungsphinx/examine</url>
+  <url type="bugtracker">https://github.com/sungsphinx/examine/issues</url>
+  <name>Examine</name>
+  <summary>View system information</summary>
+  <description>
+    <p>Examine is an app which gives you easy access to system information without needing to use the terminal, built for the COSMIC desktop.</p>
+  </description>
+  <launchable type="desktop-id">page.codeberg.sungsphinx.Examine.desktop</launchable>
+  <icon type="remote" height="256" width="256">https://raw.githubusercontent.com/sungsphinx/examine/master/res/icons/hicolor/scalable/apps/icon.svg</icon>
+  <screenshots>
+  </screenshots>
+  <provides>
+    <binaries>
+      <binary>examine</binary>
+    </binaries>
+  </provides>
+</component>

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Examine
+Exec=examine %F
+Terminal=false
+Type=Application
+StartupNotify=true
+Icon=page.codeberg.sungsphinx.Examine
+Categories=COSMIC;Utility;
+Keywords=CPU;Processor;Distribution;Information;System;

@@ -6,6 +6,10 @@
   <p>A system information viewer for the COSMIC™ Desktop</p>
 </div>
 
+## Todo
+- Show lines separately/in rows using cards/widgets and not a text widget
+- More pages
+
 ## Install
 
 To install Examine, you will need [just](https://github.com/casey/just), if you're on Pop!\_OS, you can install it with the following command:

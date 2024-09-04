@@ -65,7 +65,7 @@ run *args:
 # Installs files
 install:
     install -Dm0755 {{bin-src}} {{bin-dst}}
-    install -Dm0644 res/app.desktop {{desktop-dst}}
+    install -Dm0644 {{desktop-src}} {{desktop-dst}}
     install -Dm0644 {{icon-src}} {{icon-dst}}
 
 # Installs files (Flatpak)

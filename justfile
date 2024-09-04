@@ -3,22 +3,29 @@ appid := 'page.codeberg.sungsphinx.Examine'
 
 rootdir := ''
 prefix := '/usr'
+flatpak-prefix := '/app'
 
 base-dir := absolute_path(clean(rootdir / prefix))
+flatpak-base-dir := absolute_path(clean(rootdir / flatpak-prefix))
 
 bin-src := 'target' / 'release' / name
 bin-dst := base-dir / 'bin' / name
+flatpak-bin-dst := flatpak-base-dir / 'bin' / name
 
 desktop := appid + '.desktop'
 desktop-src := 'res' / desktop
 desktop-dst := clean(rootdir / prefix) / 'share' / 'applications' / desktop
+flatpak-desktop-dst := clean(rootdir / flatpak-prefix) / 'share' / 'applications' / desktop
 
 metainfo := appid + '.metainfo.xml'
 metainfo-src := 'res' / metainfo
 metainfo-dst := clean(rootdir / prefix) / 'share' / 'applications' / desktop
+flatpak-metainfo-dst := clean(rootdir / flatpak-prefix) / 'share' / 'applications' / desktop
 
-icons-src := 'res' / 'icons' / 'hicolor'
-icons-dst := clean(rootdir / prefix) / 'share' / 'icons' / 'hicolor'
+icon := appid + '.svg'
+icon-src := 'res' / 'icons' / 'hicolor' / 'scalable' / 'apps' / icon
+icon-dst := clean(rootdir / prefix) / 'share' / 'icons' / 'hicolor' / 'scalable' / 'apps' / icon
+flatpak-icon-dst := clean(rootdir / flatpak-prefix) / 'share' / 'icons' / 'hicolor' / 'scalable' / 'apps' / icon
 
 # Default recipe which runs `just build-release`
 default: build-release
@@ -61,9 +68,15 @@ install:
     install -Dm0644 res/app.desktop {{desktop-dst}}
     install -Dm0644 {{icon-src}} {{icon-dst}}
 
+# Installs files (Flatpak)
+flatpak:
+    install -Dm0755 {{bin-src}} {{flatpak-bin-dst}}
+    install -Dm0644 {{desktop-src}} {{flatpak-desktop-dst}}
+    install -Dm0644 {{icon-src}} {{flatpak-icon-dst}}
+
 # Uninstalls installed files
 uninstall:
-    rm {{bin-dst}} {{desktop-dst}} {{icon-svg-dst}}
+    rm {{bin-dst}} {{desktop-dst}} {{icon-dst}}
 
 # Vendor dependencies locally
 vendor:

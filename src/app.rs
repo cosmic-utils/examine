@@ -5,32 +5,26 @@ use crate::fl;
 use cosmic::app::{Command, Core};
 use cosmic::cosmic_config::{self, CosmicConfigEntry};
 use cosmic::iced::{Alignment, Length, Subscription};
-use cosmic::widget::{self, icon, menu, nav_bar, settings, row, list_column};
+use cosmic::widget::{self, icon, list_column, menu, nav_bar, row, settings};
 use cosmic::{cosmic_theme, theme, Application, ApplicationExt, Apply, Element};
-use futures_util::SinkExt;
-use std::{collections::HashMap, path::PathBuf, fs, str::FromStr};
 use etc_os_release::OsRelease;
+use futures_util::SinkExt;
 use itertools::Itertools;
+use std::{collections::HashMap, fs, path::PathBuf, str::FromStr};
 
 const REPOSITORY: &str = "https://github.com/sungsphinx/examine";
-const APP_ICON: &[u8] = include_bytes!("../res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg");
+const APP_ICON: &[u8] =
+    include_bytes!("../res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg");
 
-/// The application model stores app-specific state used to describe its interface and
-/// drive its logic.
 pub struct AppModel {
-    /// Application state which is managed by the COSMIC runtime.
     core: Core,
-    /// Display a context drawer with the designated page if defined.
     context_page: ContextPage,
-    /// Contains items assigned to the nav bar panel.
     nav: nav_bar::Model,
-    /// Key bindings for the application's menu bar.
     key_binds: HashMap<menu::KeyBind, MenuAction>,
-    // Configuration data that persists between application runs.
     config: Config,
+    lscpu: Option<String>,
 }
 
-/// Messages emitted by the application and its widgets.
 #[derive(Debug, Clone)]
 pub enum Message {
     OpenRepositoryUrl,
@@ -39,18 +33,13 @@ pub enum Message {
     UpdateConfig(Config),
 }
 
-/// Create a COSMIC application from the app model
 impl Application for AppModel {
-    /// The async executor that will be used to run your application's commands.
     type Executor = cosmic::executor::Default;
 
-    /// Data that your application receives to its init method.
     type Flags = ();
 
-    /// Messages which the application and its widgets will emit.
     type Message = Message;
 
-    /// Unique identifier in RDNN (reverse domain name notation) format.
     const APP_ID: &'static str = "page.codeberg.sungsphinx.Examine";
 
     fn core(&self) -> &Core {
@@ -61,55 +50,47 @@ impl Application for AppModel {
         &mut self.core
     }
 
-    /// Initializes the application with any given flags and startup commands.
     fn init(core: Core, _flags: Self::Flags) -> (Self, Command<Self::Message>) {
-        // Create a nav bar with three page items.
         let mut nav = nav_bar::Model::default();
 
         nav.insert()
             .text(fl!("distribution"))
-            .data::<Page>(Page::DistributionPage)
+            .data::<Page>(Page::Distribution)
             .icon(icon::from_name("applications-system-symbolic"))
             .activate();
 
         nav.insert()
             .text(fl!("processor"))
-            .data::<Page>(Page::ProcessorPage)
+            .data::<Page>(Page::Processor)
             .icon(icon::from_name("system-run-symbolic"));
 
-        // nav.insert()
-        //     .text(fl!("page-id", num = 3))
-        //     .data::<Page>(Page::Page3)
-        //     .icon(icon::from_name("applications-games-symbolic"));
-
-        // Construct the app model with the runtime's core.
         let mut app = AppModel {
             core,
             context_page: ContextPage::default(),
             nav,
             key_binds: HashMap::new(),
-            // Optional configuration file for an application.
             config: cosmic_config::Config::new(Self::APP_ID, Config::VERSION)
                 .map(|context| match Config::get_entry(&context) {
                     Ok(config) => config,
-                    Err((_errors, config)) => {
-                        // for why in errors {
-                        //     tracing::error!(%why, "error loading app config");
-                        // }
-
-                        config
-                    }
+                    Err((_errors, config)) => config,
                 })
                 .unwrap_or_default(),
+            lscpu: None,
         };
 
-        // Create a startup command that sets the window title.
+        let lscpu_cmd = std::process::Command::new("lscpu").output().unwrap();
+        match String::from_utf8(lscpu_cmd.stdout) {
+            Ok(lscpu) => app.lscpu = Some(lscpu),
+            Err(err) => {
+                eprintln!("Error parsing lscpu: {}", err);
+            }
+        }
+
         let command = app.update_title();
 
         (app, command)
     }
 
-    /// Elements to pack at the start of the header bar.
     fn header_start(&self) -> Vec<Element<Self::Message>> {
         let menu_bar = menu::bar(vec![menu::Tree::with_children(
             menu::root(fl!("view")),
@@ -122,12 +103,10 @@ impl Application for AppModel {
         vec![menu_bar.into()]
     }
 
-    /// Enables the COSMIC application to create a nav bar with this model.
     fn nav_model(&self) -> Option<&nav_bar::Model> {
         Some(&self.nav)
     }
 
-    /// Display a context drawer if the context page is requested.
     fn context_drawer(&self) -> Option<Element<Self::Message>> {
         if !self.core.window.show_context {
             return None;
@@ -138,114 +117,199 @@ impl Application for AppModel {
         })
     }
 
-    /// Describes the interface based on the current state of the application model.
-    ///
-    /// Application events will be processed through the view. Any messages emitted by
-    /// events received by widgets will be passed to the update method.
     fn view(&self) -> Element<Self::Message> {
         let page = self.nav.data::<Page>(self.nav.active());
         let is_flatpak = PathBuf::from("/.flatpak-info").exists();
         let spacing = theme::active().cosmic().spacing;
 
         let content: Element<Self::Message> = match page {
-            Some(Page::DistributionPage) => {
-                let osrelease;
-                if is_flatpak {
-                    osrelease = OsRelease::from_str(&fs::read_to_string("/run/host/os-release").unwrap()).unwrap();
+            Some(Page::Distribution) => {
+                let osrelease = if is_flatpak {
+                    OsRelease::from_str(&fs::read_to_string("/run/host/os-release").unwrap())
+                        .unwrap()
                 } else {
-                    osrelease = OsRelease::open().unwrap();
+                    OsRelease::open().unwrap()
                 };
 
                 let mut list = list_column();
 
-                list = list.add(settings::item(fl!("pretty-name"), widget::text::body(String::from(osrelease.pretty_name()))));
-                list = list.add(settings::item(fl!("name"), widget::text::body(String::from(osrelease.name()))));
-                if String::from(osrelease.version().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item(fl!("version"), widget::text::body(String::from(osrelease.version().unwrap_or_default()))));
-                }
-                if String::from(osrelease.version_id().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item(fl!("version-id"), widget::text::body(String::from(osrelease.version_id().unwrap_or_default()))));
-                }
-                list = list.add(settings::item(fl!("id"), widget::text::body(String::from(osrelease.id()))));
-                if osrelease.id_like().is_some() {
-                    list = list.add(settings::item(fl!("id-like"), widget::text::body(String::from(osrelease.id_like().unwrap().intersperse(", ").collect::<String>()))));
-                }
-                if String::from(osrelease.version_codename().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item(fl!("version-codename"), widget::text::body(String::from(osrelease.version_codename().unwrap_or_default()))));
-                }
-                if String::from(osrelease.build_id().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item(fl!("build-id"), widget::text::body(String::from(osrelease.build_id().unwrap_or_default()))));
-                }
-                if String::from(osrelease.image_id().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item(fl!("image-id"), widget::text::body(String::from(osrelease.image_id().unwrap_or_default()))));
-                }
-                if String::from(osrelease.image_version().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item(fl!("image-version"), widget::text::body(String::from(osrelease.image_version().unwrap_or_default()))));
-                }
-                if String::from(osrelease.vendor_name().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item(fl!("vendor-name"), widget::text::body(String::from(osrelease.vendor_name().unwrap_or_default()))));
-                }
-                if osrelease.ansi_color().unwrap_or_default().is_empty() == false {
-                    list = list.add(settings::item(fl!("ansi-color"), widget::text::body(String::from(osrelease.ansi_color().unwrap()))));
-                }
-                if osrelease.logo().unwrap_or_default().is_empty() == false {
-                    list = list.add(settings::item(fl!("logo"), row::with_capacity(2)
-                        .push(icon::from_name(String::from(osrelease.logo().unwrap())))
-                        .push(widget::text::body(String::from(osrelease.logo().unwrap())))
-                        .align_items(Alignment::Center)
-                        .spacing(spacing.space_xxxs)
+                list = list.add(settings::item(
+                    fl!("pretty-name"),
+                    widget::text::body(osrelease.pretty_name().to_string()),
+                ));
+                list = list.add(settings::item(
+                    fl!("name"),
+                    widget::text::body(osrelease.name().to_string()),
+                ));
+                if let Some(version) = osrelease.version() {
+                    list = list.add(settings::item(
+                        fl!("version"),
+                        widget::text::body(version.to_string()),
                     ));
                 }
-                if osrelease.cpe_name().unwrap_or_default().is_empty() == false {
-                    list = list.add(settings::item(fl!("cpe-name"), widget::text::body(String::from(osrelease.cpe_name().unwrap()))));
+                if let Some(version_id) = osrelease.version_id() {
+                    list = list.add(settings::item(
+                        fl!("version-id"),
+                        widget::text::body(version_id.to_string()),
+                    ));
                 }
-                if osrelease.home_url().unwrap_or_default().take().is_none() == false {
-                    list = list.add(settings::item(fl!("home-url"), widget::text::body(String::from(osrelease.home_url().ok().unwrap().take().unwrap().as_str()))));
+                list = list.add(settings::item(
+                    fl!("id"),
+                    widget::text::body(osrelease.id().to_string()),
+                ));
+                if let Some(mut id_like) = osrelease.id_like() {
+                    list = list.add(settings::item(
+                        fl!("id-like"),
+                        widget::text::body(id_like.join(", ")),
+                    ));
                 }
-                if osrelease.vendor_url().unwrap_or_default().take().is_none() == false {
-                    list = list.add(settings::item(fl!("vendor-url"), widget::text::body(String::from(osrelease.vendor_url().ok().unwrap().take().unwrap().as_str()))));
+                if let Some(version_codename) = osrelease.version_codename() {
+                    list = list.add(settings::item(
+                        fl!("version-codename"),
+                        widget::text::body(version_codename.to_string()),
+                    ));
                 }
-                if osrelease.documentation_url().unwrap_or_default().take().is_none() == false {
-                    list = list.add(settings::item(fl!("doc-url"), widget::text::body(String::from(osrelease.documentation_url().ok().unwrap().take().unwrap().as_str()))));
+                if let Some(build_id) = osrelease.build_id() {
+                    list = list.add(settings::item(
+                        fl!("build-id"),
+                        widget::text::body(build_id.to_string()),
+                    ));
                 }
-                if osrelease.support_url().unwrap_or_default().take().is_none() == false {
-                    list = list.add(settings::item(fl!("support-url"), widget::text::body(String::from(osrelease.support_url().ok().unwrap().take().unwrap().as_str()))));
+                if let Some(image_id) = osrelease.image_id() {
+                    list = list.add(settings::item(
+                        fl!("image-id"),
+                        widget::text::body(image_id.to_string()),
+                    ));
                 }
-                if osrelease.bug_report_url().unwrap_or_default().take().is_none() == false {
-                    list = list.add(settings::item(fl!("bug-report-url"), widget::text::body(String::from(osrelease.bug_report_url().ok().unwrap().take().unwrap().as_str()))));
+                if let Some(image_version) = osrelease.image_version() {
+                    list = list.add(settings::item(
+                        fl!("image-version"),
+                        widget::text::body(image_version.to_string()),
+                    ));
                 }
-                if osrelease.privacy_policy_url().unwrap_or_default().take().is_none() == false {
-                    list = list.add(settings::item(fl!("privacy-policy-url"), widget::text::body(String::from(osrelease.privacy_policy_url().unwrap().take().unwrap().to_string()))));
+                if let Some(vendor_name) = osrelease.vendor_name() {
+                    list = list.add(settings::item(
+                        fl!("vendor-name"),
+                        widget::text::body(vendor_name.to_string()),
+                    ));
                 }
-                if osrelease.support_end().unwrap_or_default().take().is_none() == false {
-                    list = list.add(settings::item(fl!("support-end"), widget::text::body(String::from(osrelease.support_end().unwrap().take().unwrap().to_string()))));
+                if let Some(ansi_color) = osrelease.ansi_color() {
+                    list = list.add(settings::item(
+                        fl!("ansi-color"),
+                        widget::text::body(ansi_color.to_string()),
+                    ));
                 }
-                if String::from(osrelease.variant().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item(fl!("variant"), widget::text::body(String::from(osrelease.variant().unwrap_or_default()))));
+                if let Some(logo) = osrelease.logo() {
+                    list = list.add(settings::item(
+                        fl!("logo"),
+                        row::with_capacity(2)
+                            .push(icon::from_name(logo.to_string()))
+                            .push(widget::text::body(logo.to_string()))
+                            .align_items(Alignment::Center)
+                            .spacing(spacing.space_xxxs),
+                    ));
                 }
-                if String::from(osrelease.variant_id().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item(fl!("variant-id"), widget::text::body(String::from(osrelease.variant_id().unwrap_or_default()))));
+                if let Some(cpe_name) = osrelease.cpe_name() {
+                    list = list.add(settings::item(
+                        fl!("cpe-name"),
+                        widget::text::body(cpe_name.to_string()),
+                    ));
                 }
-                if String::from(osrelease.default_hostname().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item(fl!("default-hostname"), widget::text::body(String::from(osrelease.default_hostname().unwrap_or_default()))));
+                if let Ok(Some(home_url)) = osrelease.home_url() {
+                    list = list.add(settings::item(
+                        fl!("home-url"),
+                        widget::text::body(home_url.to_string()),
+                    ));
                 }
-                if String::from(osrelease.architecture().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item(fl!("arch"), widget::text::body(String::from(osrelease.architecture().unwrap_or_default()))));
+                if let Ok(Some(support_url)) = osrelease.support_url() {
+                    list = list.add(settings::item(
+                        fl!("vendor-url"),
+                        widget::text::body(support_url.to_string()),
+                    ));
                 }
-                if String::from(osrelease.sysext_level().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item("SYSEXT_LEVEL", widget::text::body(String::from(osrelease.sysext_level().unwrap_or_default()))));
+                if let Ok(Some(documentation_url)) = osrelease.documentation_url() {
+                    list = list.add(settings::item(
+                        fl!("doc-url"),
+                        widget::text::body(documentation_url.to_string()),
+                    ));
                 }
-                if osrelease.sysext_scope().is_some() {
-                    list = list.add(settings::item("SYSEXT_SCOPE", widget::text::body(String::from(osrelease.sysext_scope().unwrap().intersperse(", ").collect::<String>()))));
+                if let Ok(Some(support_url)) = osrelease.support_url() {
+                    list = list.add(settings::item(
+                        fl!("support-url"),
+                        widget::text::body(support_url.to_string()),
+                    ));
                 }
-                if String::from(osrelease.confext_level().unwrap_or_default()).is_empty() == false {
-                    list = list.add(settings::item("CONFEXT_LEVEL", widget::text::body(String::from(osrelease.confext_level().unwrap_or_default()))));
+                if let Ok(Some(bug_report_url)) = osrelease.bug_report_url() {
+                    list = list.add(settings::item(
+                        fl!("bug-report-url"),
+                        widget::text::body(bug_report_url.to_string()),
+                    ));
                 }
-                if osrelease.confext_scope().is_some() {
-                    list = list.add(settings::item("CONFEXT_SCOPE", widget::text::body(String::from(osrelease.confext_scope().unwrap().intersperse(", ").collect::<String>()))));
+                if let Ok(Some(privacy_policy_url)) = osrelease.privacy_policy_url() {
+                    list = list.add(settings::item(
+                        fl!("privacy-policy-url"),
+                        widget::text::body(privacy_policy_url.to_string()),
+                    ));
                 }
-                if osrelease.portable_prefixes().is_some() {
-                    list = list.add(settings::item(fl!("portable-prefixes"), widget::text::body(String::from(osrelease.portable_prefixes().unwrap().intersperse(", ").collect::<String>()))));
+                if let Some(support_end) = osrelease.support_end().unwrap_or_default().take() {
+                    list = list.add(settings::item(
+                        fl!("support-end"),
+                        widget::text::body(support_end.to_string()),
+                    ));
+                }
+                if let Some(variant) = osrelease.variant() {
+                    list = list.add(settings::item(
+                        fl!("variant"),
+                        widget::text::body(variant.to_string()),
+                    ));
+                }
+                if let Some(variant_id) = osrelease.variant_id() {
+                    list = list.add(settings::item(
+                        fl!("variant-id"),
+                        widget::text::body(variant_id.to_string()),
+                    ));
+                }
+                if let Some(default_hostname) = osrelease.default_hostname() {
+                    list = list.add(settings::item(
+                        fl!("default-hostname"),
+                        widget::text::body(default_hostname.to_string()),
+                    ));
+                }
+                if let Some(architecture) = osrelease.architecture() {
+                    list = list.add(settings::item(
+                        fl!("arch"),
+                        widget::text::body(architecture.to_string()),
+                    ));
+                }
+                if let Some(sysext_level) = osrelease.sysext_level() {
+                    list = list.add(settings::item(
+                        "SYSEXT_LEVEL",
+                        widget::text::body(sysext_level.to_string()),
+                    ));
+                }
+                if let Some(mut sysext_scope) = osrelease.sysext_scope() {
+                    list = list.add(settings::item(
+                        "SYSEXT_SCOPE",
+                        widget::text::body(sysext_scope.join(", ")),
+                    ));
+                }
+                if let Some(confext_level) = osrelease.confext_level() {
+                    list = list.add(settings::item(
+                        "CONFEXT_LEVEL",
+                        widget::text::body(confext_level.to_string()),
+                    ));
+                }
+                if let Some(mut confext_scope) = osrelease.confext_scope() {
+                    list = list.add(settings::item(
+                        "CONFEXT_SCOPE",
+                        widget::text::body(confext_scope.join(", ")),
+                    ));
+                }
+                if let Some(mut portable_prefixes) = osrelease.portable_prefixes() {
+                    list = list.add(settings::item(
+                        fl!("portable-prefixes"),
+                        widget::text::body(portable_prefixes.join(", ")),
+                    ));
                 }
 
                 widget::column::with_capacity(2)
@@ -257,15 +321,23 @@ impl Application for AppModel {
                     .height(Length::Fill)
                     .into()
             }
-            Some(Page::ProcessorPage) => {
-                let lscpu_cmd = std::process::Command::new("lscpu")
-                        .output()
-                        .unwrap();
-                let lscpu = String::from_utf8(lscpu_cmd.stdout).unwrap();
+            Some(Page::Processor) => {
+                let Some(lscpu) = &self.lscpu else {
+                    return widget::text::title1(fl!("no-page")).into();
+                };
+                let lscpu = lscpu
+                    .lines()
+                    .map(|line: &str| {
+                        let (prefix, suffix) = line.split_once(":").unwrap();
+                        widget::settings::item(prefix, widget::text::body(suffix)).into()
+                    })
+                    .collect::<Vec<Element<Message>>>();
 
-                widget::text::body(lscpu)
-                    .apply(cosmic::iced::widget::scrollable)
-                    .into()
+                let mut section = widget::settings::view_section("");
+                for item in lscpu {
+                    section = section.add(item);
+                }
+                section.apply(cosmic::iced::widget::scrollable).into()
             }
             None => widget::text::title1(fl!("no-page")).into(),
         };
@@ -276,16 +348,10 @@ impl Application for AppModel {
             .into()
     }
 
-    /// Register subscriptions for this application.
-    ///
-    /// Subscriptions are long-running async tasks running in the background which
-    /// emit messages to the application through a channel. They are started at the
-    /// beginning of the application, and persist through its lifetime.
     fn subscription(&self) -> Subscription<Self::Message> {
         struct MySubscription;
 
         Subscription::batch(vec![
-            // Create a subscription which emits updates through a channel.
             cosmic::iced::subscription::channel(
                 std::any::TypeId::of::<MySubscription>(),
                 4,
@@ -295,23 +361,12 @@ impl Application for AppModel {
                     futures_util::future::pending().await
                 },
             ),
-            // Watch for application configuration changes.
             self.core()
                 .watch_config::<Config>(Self::APP_ID)
-                .map(|update| {
-                    // for why in update.errors {
-                    //     tracing::error!(?why, "app config error");
-                    // }
-
-                    Message::UpdateConfig(update.config)
-                }),
+                .map(|update| Message::UpdateConfig(update.config)),
         ])
     }
 
-    /// Handles messages emitted by the application and its widgets.
-    ///
-    /// Commands may be returned for asynchronous execution of code in the background
-    /// on the application's async runtime.
     fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
         match message {
             Message::OpenRepositoryUrl => {
@@ -324,15 +379,12 @@ impl Application for AppModel {
 
             Message::ToggleContextPage(context_page) => {
                 if self.context_page == context_page {
-                    // Close the context drawer if the toggled context page is the same.
                     self.core.window.show_context = !self.core.window.show_context;
                 } else {
-                    // Open the context drawer to display the requested context page.
                     self.context_page = context_page;
                     self.core.window.show_context = true;
                 }
 
-                // Set the title of the context drawer.
                 self.set_context_title(context_page.title());
             }
 
@@ -343,11 +395,8 @@ impl Application for AppModel {
         Command::none()
     }
 
-    /// Called when a nav item is selected.
     fn on_nav_select(&mut self, id: nav_bar::Id) -> Command<Self::Message> {
-        // Activate the page in the model.
         self.nav.activate(id);
-
         self.update_title()
     }
 }
@@ -389,8 +438,8 @@ impl AppModel {
 
 /// The page to display in the application.
 pub enum Page {
-    DistributionPage,
-    ProcessorPage,
+    Distribution,
+    Processor,
 }
 
 /// The context page to display in the context drawer.

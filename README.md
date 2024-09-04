@@ -7,8 +7,8 @@
 </div>
 
 ## Todo
-- Show lines separately/in rows using cards/widgets and not a text widget
-- More pages
+- [ ] Show lines separately/in rows using cards/widgets and not a text widget (Distribution page completed)
+- [ ] More pages
 
 ## Install
 

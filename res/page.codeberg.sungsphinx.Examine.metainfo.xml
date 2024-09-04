@@ -11,10 +11,10 @@
   <name>Examine</name>
   <summary>View system information</summary>
   <description>
-    <p>Examine is an app which gives you easy access to system information without needing to use the terminal, built for the COSMIC desktop.</p>
+    <p>Examine is an app which gives you easy access to system information without needing to use the terminal, built for the COSMIC™ desktop.</p>
   </description>
   <launchable type="desktop-id">page.codeberg.sungsphinx.Examine.desktop</launchable>
-  <icon type="remote" height="256" width="256">https://raw.githubusercontent.com/sungsphinx/examine/master/res/icons/hicolor/scalable/apps/icon.svg</icon>
+  <icon type="remote" height="256" width="256">https://raw.githubusercontent.com/sungsphinx/examine/master/res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg</icon>
   <screenshots>
   </screenshots>
   <provides>

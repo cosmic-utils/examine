@@ -22,6 +22,7 @@ pub struct AppModel {
     nav: nav_bar::Model,
     key_binds: HashMap<menu::KeyBind, MenuAction>,
     config: Config,
+    lscpu: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -74,7 +75,16 @@ impl Application for AppModel {
                     Err((_errors, config)) => config,
                 })
                 .unwrap_or_default(),
+            lscpu: None,
         };
+
+        let lscpu_cmd = std::process::Command::new("lscpu").output().unwrap();
+        match String::from_utf8(lscpu_cmd.stdout) {
+            Ok(lscpu) => app.lscpu = Some(lscpu),
+            Err(err) => {
+                eprintln!("Error parsing lscpu: {}", err);
+            }
+        }
 
         let command = app.update_title();
 
@@ -312,12 +322,22 @@ impl Application for AppModel {
                     .into()
             }
             Some(Page::Processor) => {
-                let lscpu_cmd = std::process::Command::new("lscpu").output().unwrap();
-                let lscpu = String::from_utf8(lscpu_cmd.stdout).unwrap();
+                let Some(lscpu) = &self.lscpu else {
+                    return widget::text::title1(fl!("no-page")).into();
+                };
+                let lscpu = lscpu
+                    .lines()
+                    .map(|line: &str| {
+                        let (prefix, suffix) = line.split_once(":").unwrap();
+                        widget::settings::item(prefix, widget::text::body(suffix)).into()
+                    })
+                    .collect::<Vec<Element<Message>>>();
 
-                widget::text::body(lscpu)
-                    .apply(cosmic::iced::widget::scrollable)
-                    .into()
+                let mut section = widget::settings::view_section("");
+                for item in lscpu {
+                    section = section.add(item);
+                }
+                section.apply(cosmic::iced::widget::scrollable).into()
             }
             None => widget::text::title1(fl!("no-page")).into(),
         };

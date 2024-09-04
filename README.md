@@ -4,6 +4,8 @@
   <h1>Examine</h1>
 
   <p>A system information viewer for the COSMIC™ Desktop</p>
+
+  <img src="res/screenshots/distribution.png"/>
 </div>
 
 ## Todo

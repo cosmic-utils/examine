@@ -1452,6 +1452,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "etc-os-release"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3ab3b560ce06f55db2a56928ad3e051680eb1995feb21c855619e08cb7f0a2b"
+dependencies = [
+ "chrono",
+ "indexmap",
+ "thiserror",
+ "url",
+]
+
+[[package]]
 name = "euclid"
 version = "0.22.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1523,14 +1535,16 @@ dependencies = [
 name = "examine"
 version = "0.1.0"
 dependencies = [
+ "etc-os-release",
  "futures-util",
  "i18n-embed",
  "i18n-embed-fl",
+ "itertools",
  "libcosmic",
- "once_cell",
  "open",
  "rust-embed",
  "tokio",
+ "url",
 ]
 
 [[package]]
@@ -2567,6 +2581,15 @@ checksum = "173609498df190136aa7dea1a91db051746d339e18476eed5ca40521f02d7aa5"
 dependencies = [
  "is-docker",
  "once_cell",
+]
+
+[[package]]
+name = "itertools"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
+dependencies = [
+ "either",
 ]
 
 [[package]]
@@ -4828,9 +4851,9 @@ checksum = "f962df74c8c05a667b5ee8bcf162993134c104e96440b663c8daa176dc772d8c"
 
 [[package]]
 name = "url"
-version = "2.5.0"
+version = "2.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "31e6302e3bb753d46e83516cae55ae196fc0c309407cf11ab35cc51a4c2a4633"
+checksum = "22784dbdf76fdde8af1aeda5622b546b422b6fc585325248a2bf9f5e41e94d6c"
 dependencies = [
  "form_urlencoded",
  "idna",

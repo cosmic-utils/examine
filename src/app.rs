@@ -4,13 +4,13 @@ use crate::config::Config;
 use crate::fl;
 use cosmic::app::{Command, Core};
 use cosmic::cosmic_config::{self, CosmicConfigEntry};
-use cosmic::iced::alignment::{Horizontal, Vertical};
 use cosmic::iced::{Alignment, Length, Subscription};
-use cosmic::widget::{self, icon, menu, nav_bar};
+use cosmic::widget::{self, icon, menu, nav_bar, settings, row, list_column};
 use cosmic::{cosmic_theme, theme, Application, ApplicationExt, Apply, Element};
 use futures_util::SinkExt;
-use std::collections::HashMap;
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf, fs, str::FromStr};
+use etc_os_release::OsRelease;
+use itertools::Itertools;
 
 const REPOSITORY: &str = "https://github.com/sungsphinx/examine";
 const APP_ICON: &[u8] = include_bytes!("../res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg");
@@ -145,25 +145,116 @@ impl Application for AppModel {
     fn view(&self) -> Element<Self::Message> {
         let page = self.nav.data::<Page>(self.nav.active());
         let is_flatpak = PathBuf::from("/.flatpak-info").exists();
+        let spacing = theme::active().cosmic().spacing;
 
         let content: Element<Self::Message> = match page {
             Some(Page::DistributionPage) => {
-                let osrelease_cmd;
+                let osrelease;
                 if is_flatpak {
-                    osrelease_cmd = std::process::Command::new("flatpak-spawn --host")
-                        .args(["cat", "/etc/os-release"])
-                        .output()
-                        .unwrap();
+                    osrelease = OsRelease::from_str(&fs::read_to_string("/run/host/os-release").unwrap()).unwrap();
                 } else {
-                    osrelease_cmd = std::process::Command::new("cat")
-                        .arg("/etc/os-release")
-                        .output()
-                        .unwrap();
+                    osrelease = OsRelease::open().unwrap();
                 };
-                let osrelease = String::from_utf8(osrelease_cmd.stdout).unwrap();
 
-                widget::text::body(osrelease)
-                    .apply(cosmic::iced::widget::scrollable)
+                let mut list = list_column();
+
+                list = list.add(settings::item(fl!("pretty-name"), widget::text::body(String::from(osrelease.pretty_name()))));
+                list = list.add(settings::item(fl!("name"), widget::text::body(String::from(osrelease.name()))));
+                if String::from(osrelease.version().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item(fl!("version"), widget::text::body(String::from(osrelease.version().unwrap_or_default()))));
+                }
+                if String::from(osrelease.version_id().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item(fl!("version-id"), widget::text::body(String::from(osrelease.version_id().unwrap_or_default()))));
+                }
+                list = list.add(settings::item(fl!("id"), widget::text::body(String::from(osrelease.id()))));
+                if osrelease.id_like().is_some() {
+                    list = list.add(settings::item(fl!("id-like"), widget::text::body(String::from(osrelease.id_like().unwrap().intersperse(", ").collect::<String>()))));
+                }
+                if String::from(osrelease.version_codename().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item(fl!("version-codename"), widget::text::body(String::from(osrelease.version_codename().unwrap_or_default()))));
+                }
+                if String::from(osrelease.build_id().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item(fl!("build-id"), widget::text::body(String::from(osrelease.build_id().unwrap_or_default()))));
+                }
+                if String::from(osrelease.image_id().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item(fl!("image-id"), widget::text::body(String::from(osrelease.image_id().unwrap_or_default()))));
+                }
+                if String::from(osrelease.image_version().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item(fl!("image-version"), widget::text::body(String::from(osrelease.image_version().unwrap_or_default()))));
+                }
+                if String::from(osrelease.vendor_name().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item(fl!("vendor-name"), widget::text::body(String::from(osrelease.vendor_name().unwrap_or_default()))));
+                }
+                if osrelease.ansi_color().unwrap_or_default().is_empty() == false {
+                    list = list.add(settings::item(fl!("ansi-color"), widget::text::body(String::from(osrelease.ansi_color().unwrap()))));
+                }
+                if osrelease.logo().unwrap_or_default().is_empty() == false {
+                    list = list.add(settings::item(fl!("logo"), row::with_capacity(2)
+                        .push(icon::from_name(String::from(osrelease.logo().unwrap())))
+                        .push(widget::text::body(String::from(osrelease.logo().unwrap())))
+                        .align_items(Alignment::Center)
+                        .spacing(spacing.space_xxxs)
+                    ));
+                }
+                if osrelease.cpe_name().unwrap_or_default().is_empty() == false {
+                    list = list.add(settings::item(fl!("cpe-name"), widget::text::body(String::from(osrelease.cpe_name().unwrap()))));
+                }
+                if osrelease.home_url().unwrap_or_default().take().is_none() == false {
+                    list = list.add(settings::item(fl!("home-url"), widget::text::body(String::from(osrelease.home_url().ok().unwrap().take().unwrap().as_str()))));
+                }
+                if osrelease.vendor_url().unwrap_or_default().take().is_none() == false {
+                    list = list.add(settings::item(fl!("vendor-url"), widget::text::body(String::from(osrelease.vendor_url().ok().unwrap().take().unwrap().as_str()))));
+                }
+                if osrelease.documentation_url().unwrap_or_default().take().is_none() == false {
+                    list = list.add(settings::item(fl!("doc-url"), widget::text::body(String::from(osrelease.documentation_url().ok().unwrap().take().unwrap().as_str()))));
+                }
+                if osrelease.support_url().unwrap_or_default().take().is_none() == false {
+                    list = list.add(settings::item(fl!("support-url"), widget::text::body(String::from(osrelease.support_url().ok().unwrap().take().unwrap().as_str()))));
+                }
+                if osrelease.bug_report_url().unwrap_or_default().take().is_none() == false {
+                    list = list.add(settings::item(fl!("bug-report-url"), widget::text::body(String::from(osrelease.bug_report_url().ok().unwrap().take().unwrap().as_str()))));
+                }
+                if osrelease.privacy_policy_url().unwrap_or_default().take().is_none() == false {
+                    list = list.add(settings::item(fl!("privacy-policy-url"), widget::text::body(String::from(osrelease.privacy_policy_url().unwrap().take().unwrap().to_string()))));
+                }
+                if osrelease.support_end().unwrap_or_default().take().is_none() == false {
+                    list = list.add(settings::item(fl!("support-end"), widget::text::body(String::from(osrelease.support_end().unwrap().take().unwrap().to_string()))));
+                }
+                if String::from(osrelease.variant().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item(fl!("variant"), widget::text::body(String::from(osrelease.variant().unwrap_or_default()))));
+                }
+                if String::from(osrelease.variant_id().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item(fl!("variant-id"), widget::text::body(String::from(osrelease.variant_id().unwrap_or_default()))));
+                }
+                if String::from(osrelease.default_hostname().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item(fl!("default-hostname"), widget::text::body(String::from(osrelease.default_hostname().unwrap_or_default()))));
+                }
+                if String::from(osrelease.architecture().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item(fl!("arch"), widget::text::body(String::from(osrelease.architecture().unwrap_or_default()))));
+                }
+                if String::from(osrelease.sysext_level().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item("SYSEXT_LEVEL", widget::text::body(String::from(osrelease.sysext_level().unwrap_or_default()))));
+                }
+                if osrelease.sysext_scope().is_some() {
+                    list = list.add(settings::item("SYSEXT_SCOPE", widget::text::body(String::from(osrelease.sysext_scope().unwrap().intersperse(", ").collect::<String>()))));
+                }
+                if String::from(osrelease.confext_level().unwrap_or_default()).is_empty() == false {
+                    list = list.add(settings::item("CONFEXT_LEVEL", widget::text::body(String::from(osrelease.confext_level().unwrap_or_default()))));
+                }
+                if osrelease.confext_scope().is_some() {
+                    list = list.add(settings::item("CONFEXT_SCOPE", widget::text::body(String::from(osrelease.confext_scope().unwrap().intersperse(", ").collect::<String>()))));
+                }
+                if osrelease.portable_prefixes().is_some() {
+                    list = list.add(settings::item(fl!("portable-prefixes"), widget::text::body(String::from(osrelease.portable_prefixes().unwrap().intersperse(", ").collect::<String>()))));
+                }
+
+                widget::column::with_capacity(2)
+                    .spacing(spacing.space_xxs)
+                    .push(list)
+                    .apply(widget::container)
+                    .height(Length::Shrink)
+                    .apply(widget::scrollable)
+                    .height(Length::Fill)
                     .into()
             }
             Some(Page::ProcessorPage) => {
@@ -182,8 +273,6 @@ impl Application for AppModel {
         widget::container(content)
             .width(Length::Fill)
             .height(Length::Fill)
-            // .align_x(Horizontal::Center)
-            // .align_y(Vertical::Center)
             .into()
     }
 

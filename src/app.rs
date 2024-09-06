@@ -23,6 +23,7 @@ pub struct AppModel {
     key_binds: HashMap<menu::KeyBind, MenuAction>,
     config: Config,
     lscpu: Option<String>,
+    lspci: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -64,6 +65,11 @@ impl Application for AppModel {
             .data::<Page>(Page::Processor)
             .icon(icon::from_name("system-run-symbolic"));
 
+        nav.insert()
+            .text(fl!("pci-devices"))
+            .data::<Page>(Page::PCI)
+            .icon(icon::from_name("drive-harddisk-usb-symbolic"));
+
         let mut app = AppModel {
             core,
             context_page: ContextPage::default(),
@@ -76,6 +82,7 @@ impl Application for AppModel {
                 })
                 .unwrap_or_default(),
             lscpu: None,
+            lspci: None,
         };
 
         let lscpu_cmd = std::process::Command::new("lscpu").output().unwrap();
@@ -83,6 +90,14 @@ impl Application for AppModel {
             Ok(lscpu) => app.lscpu = Some(lscpu),
             Err(err) => {
                 eprintln!("Error parsing lscpu: {}", err);
+            }
+        }
+
+        let lspci_cmd = std::process::Command::new("lspci").output().unwrap();
+        match String::from_utf8(lspci_cmd.stdout) {
+            Ok(lspci) => app.lspci = Some(lspci),
+            Err(err) => {
+                eprintln!("Error parsing lspci: {}", err);
             }
         }
 
@@ -323,7 +338,7 @@ impl Application for AppModel {
             }
             Some(Page::Processor) => {
                 let Some(lscpu) = &self.lscpu else {
-                    return widget::text::title1(fl!("no-page")).into();
+                    return widget::text::title1(fl!("something-went-wrong")).into();
                 };
                 let lscpu = lscpu
                     .lines()
@@ -337,7 +352,25 @@ impl Application for AppModel {
                 for item in lscpu {
                     section = section.add(item);
                 }
-                section.apply(cosmic::iced::widget::scrollable).into()
+                section.apply(widget::scrollable).into()
+            }
+            Some(Page::PCI) => {
+                let Some(lspci) = &self.lspci else {
+                    return widget::text::title1(fl!("something-went-wrong")).into();
+                };
+                let lspci = lspci
+                    .lines()
+                    .map(|line: &str| {
+                        let (prefix, suffix) = line.split_once(": ").unwrap();
+                        widget::settings::item(suffix, widget::text::body(prefix)).into()
+                    })
+                    .collect::<Vec<Element<Message>>>();
+
+                let mut section = widget::settings::view_section("");
+                for item in lspci {
+                    section = section.add(item);
+                }
+                section.apply(widget::scrollable).into()
             }
             None => widget::text::title1(fl!("no-page")).into(),
         };
@@ -440,6 +473,7 @@ impl AppModel {
 pub enum Page {
     Distribution,
     Processor,
+    PCI,
 }
 
 /// The context page to display in the context drawer.

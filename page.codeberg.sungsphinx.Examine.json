@@ -70,8 +70,8 @@
             "sources": [
                 {
                     "type": "git",
-                    "branch": "main",
-                    "url": "https://github.com/sungsphinx/examine.git"
+                    "url": "https://github.com/sungsphinx/examine.git",
+                    "branch": "main"
                 }
             ]
         }

@@ -179,10 +179,13 @@ impl Application for AppModel {
                     ));
                 }
                 if let Some(version_codename) = osrelease.version_codename() {
-                    list = list.add(settings::item(
-                        fl!("version-codename"),
-                        widget::text::body(version_codename.to_string()),
-                    ));
+                    // Fedora (and possibly other distros) set VERSION_CODENAME to a blank string, so check if it is empty
+                    if !version_codename.to_string().is_empty() {
+                        list = list.add(settings::item(
+                            fl!("version-codename"),
+                            widget::text::body(version_codename.to_string()),
+                        ));
+                    }
                 }
                 if let Some(build_id) = osrelease.build_id() {
                     list = list.add(settings::item(

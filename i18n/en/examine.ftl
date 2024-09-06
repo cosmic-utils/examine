@@ -1,10 +1,16 @@
+# General
 app-title = Examine
 about = About
 view = View
 no-page = Select a Page
 distribution = Distribution
 processor = Processor
+pci-devices = PCIs
 not-provided = Not Provided
+wip = Work in Progress
+something-went-wrong = Uh oh, something went wrong!
+
+# Distribution Page
 pretty-name = Pretty Name
 name = Name
 id = ID
@@ -31,4 +37,3 @@ variant-id = Variant ID
 default-hostname = Default Hostname
 arch = Architecture
 portable-prefixes = Portable Prefixes
-more-section = More

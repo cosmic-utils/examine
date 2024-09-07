@@ -70,7 +70,7 @@
             "sources": [
                 {
                     "type": "git",
-                    "url": "https://github.com/sungsphinx/examine.git",
+                    "url": "https://github.com/cosmic-utils/examine.git",
                     "branch": "main"
                 }
             ]

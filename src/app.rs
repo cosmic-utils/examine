@@ -12,7 +12,7 @@ use futures_util::SinkExt;
 use itertools::Itertools;
 use std::{collections::HashMap, fs, path::PathBuf, str::FromStr};
 
-const REPOSITORY: &str = "https://github.com/sungsphinx/examine";
+const REPOSITORY: &str = "https://github.com/cosmic-utils/examine";
 const APP_ICON: &[u8] =
     include_bytes!("../res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg");
 

@@ -6,15 +6,15 @@
   <project_group>COSMIC</project_group>
   <developer_name>Dexter Reed</developer_name>
   <update_contact>dreed4470@proton.me</update_contact>
-  <url type="homepage">https://github.com/sungsphinx/examine</url>
-  <url type="bugtracker">https://github.com/sungsphinx/examine/issues</url>
+  <url type="homepage">https://github.com/cosmic-utils/examine</url>
+  <url type="bugtracker">https://github.com/cosmic-utils/examine/issues</url>
   <name>Examine</name>
   <summary>View system information</summary>
   <description>
     <p>Examine is an app which gives you easy access to system information without needing to use the terminal, built for the COSMIC™ desktop.</p>
   </description>
   <launchable type="desktop-id">page.codeberg.sungsphinx.Examine.desktop</launchable>
-  <icon type="remote" height="256" width="256">https://raw.githubusercontent.com/sungsphinx/examine/master/res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg</icon>
+  <icon type="remote" height="256" width="256">https://raw.githubusercontent.com/cosmic-utils/examine/main/res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg</icon>
   <screenshots>
   </screenshots>
   <provides>

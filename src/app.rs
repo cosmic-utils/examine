@@ -24,6 +24,7 @@ pub struct AppModel {
     config: Config,
     lscpu: Option<String>,
     lspci: Option<String>,
+    lsusb: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -70,6 +71,11 @@ impl Application for AppModel {
             .data::<Page>(Page::PCI)
             .icon(icon::from_name("drive-harddisk-usb-symbolic"));
 
+        nav.insert()
+            .text(fl!("usb-devices"))
+            .data::<Page>(Page::USB)
+            .icon(icon::from_name("drive-harddisk-usb-symbolic"));
+
         let mut app = AppModel {
             core,
             context_page: ContextPage::default(),
@@ -83,6 +89,7 @@ impl Application for AppModel {
                 .unwrap_or_default(),
             lscpu: None,
             lspci: None,
+            lsusb: None,
         };
 
         let lscpu_cmd = std::process::Command::new("lscpu").output().unwrap();
@@ -98,6 +105,14 @@ impl Application for AppModel {
             Ok(lspci) => app.lspci = Some(lspci),
             Err(err) => {
                 eprintln!("Error parsing lspci: {}", err);
+            }
+        }
+
+        let lsusb_cmd = std::process::Command::new("lsusb").output().unwrap();
+        match String::from_utf8(lsusb_cmd.stdout) {
+            Ok(lsusb) => app.lsusb = Some(lsusb),
+            Err(err) => {
+                eprintln!("Error parsing lsusb: {}", err);
             }
         }
 
@@ -375,6 +390,24 @@ impl Application for AppModel {
                 }
                 section.apply(widget::scrollable).into()
             }
+            Some(Page::USB) => {
+                let Some(lsusb) = &self.lsusb else {
+                    return widget::text::title1(fl!("something-went-wrong")).into();
+                };
+                let lsusb = lsusb
+                    .lines()
+                    .map(|line: &str| {
+                        let (prefix, suffix) = line.split_once(": ").unwrap();
+                        widget::settings::item(suffix, widget::text::body(prefix)).into()
+                    })
+                    .collect::<Vec<Element<Message>>>();
+
+                let mut section = widget::settings::view_section("");
+                for item in lsusb {
+                    section = section.add(item);
+                }
+                section.apply(widget::scrollable).into()
+            }
             None => widget::text::title1(fl!("no-page")).into(),
         };
 
@@ -477,6 +510,7 @@ pub enum Page {
     Distribution,
     Processor,
     PCI,
+    USB,
 }
 
 /// The context page to display in the context drawer.

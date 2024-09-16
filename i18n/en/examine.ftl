@@ -6,6 +6,7 @@ no-page = Select a Page
 distribution = Distribution
 processor = Processor
 pci-devices = PCIs
+usb-devices = USBs
 not-provided = Not Provided
 wip = Work in Progress
 something-went-wrong = Uh oh, something went wrong!

@@ -74,7 +74,7 @@ impl Application for AppModel {
         nav.insert()
             .text(fl!("usb-devices"))
             .data::<Page>(Page::USB)
-            .icon(icon::from_name("drive-harddisk-usb-symbolic"));
+            .icon(icon::from_name("media-removable-symbolic"));
 
         let mut app = AppModel {
             core,

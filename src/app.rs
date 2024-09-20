@@ -362,11 +362,11 @@ impl Application for AppModel {
                     .lines()
                     .map(|line: &str| {
                         let (prefix, suffix) = line.split_once(":").unwrap();
-                        widget::settings::item(prefix, widget::text::body(suffix)).into()
+                        settings::item(prefix, widget::text::body(suffix)).into()
                     })
                     .collect::<Vec<Element<Message>>>();
 
-                let mut section = widget::settings::view_section("");
+                let mut section = list_column();
                 for item in lscpu {
                     section = section.add(item);
                 }
@@ -380,11 +380,11 @@ impl Application for AppModel {
                     .lines()
                     .map(|line: &str| {
                         let (prefix, suffix) = line.split_once(": ").unwrap();
-                        widget::settings::item(suffix, widget::text::body(prefix)).into()
+                        settings::item(suffix, widget::text::body(prefix)).into()
                     })
                     .collect::<Vec<Element<Message>>>();
 
-                let mut section = widget::settings::view_section("");
+                let mut section = list_column();
                 for item in lspci {
                     section = section.add(item);
                 }
@@ -398,11 +398,11 @@ impl Application for AppModel {
                     .lines()
                     .map(|line: &str| {
                         let (prefix, suffix) = line.split_once(": ").unwrap();
-                        widget::settings::item(suffix, widget::text::body(prefix)).into()
+                        settings::item(suffix, widget::text::body(prefix)).into()
                     })
                     .collect::<Vec<Element<Message>>>();
 
-                let mut section = widget::settings::view_section("");
+                let mut section = list_column();
                 for item in lsusb {
                     section = section.add(item);
                 }

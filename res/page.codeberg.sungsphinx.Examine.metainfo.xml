@@ -17,7 +17,12 @@
   <icon type="remote" height="256" width="256">https://raw.githubusercontent.com/cosmic-utils/examine/main/res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg</icon>
   <screenshots>
   </screenshots>
+  <categories>
+    <category>Utility</category>
+    <category>System</category>
+  </categories>
   <provides>
+    <id>com.system76.CosmicApplication</id>
     <binaries>
       <binary>examine</binary>
     </binaries>

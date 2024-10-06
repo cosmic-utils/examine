@@ -9,7 +9,8 @@ pci-devices = PCIs
 usb-devices = USBs
 not-provided = Not Provided
 wip = Work in Progress
-something-went-wrong = Uh oh, something went wrong!
+error-occurred = An error has occurred
+error-occurred-with-msg = An error has occurred: {$error}
 
 # Distribution Page
 pretty-name = Pretty Name

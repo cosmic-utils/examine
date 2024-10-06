@@ -11,6 +11,7 @@ use etc_os_release::OsRelease;
 use futures_util::SinkExt;
 use itertools::Itertools;
 use std::{collections::HashMap, fs, path::PathBuf, str::FromStr};
+use log::error;
 
 const REPOSITORY: &str = "https://github.com/cosmic-utils/examine";
 const APP_ICON: &[u8] =
@@ -68,12 +69,12 @@ impl Application for AppModel {
 
         nav.insert()
             .text(fl!("pci-devices"))
-            .data::<Page>(Page::PCI)
+            .data::<Page>(Page::PCIs)
             .icon(icon::from_name("drive-harddisk-usb-symbolic"));
 
         nav.insert()
             .text(fl!("usb-devices"))
-            .data::<Page>(Page::USB)
+            .data::<Page>(Page::USBs)
             .icon(icon::from_name("media-removable-symbolic"));
 
         let mut app = AppModel {
@@ -92,28 +93,28 @@ impl Application for AppModel {
             lsusb: None,
         };
 
-        let lscpu_cmd = std::process::Command::new("lscpu").output().unwrap();
-        match String::from_utf8(lscpu_cmd.stdout) {
-            Ok(lscpu) => app.lscpu = Some(lscpu),
-            Err(err) => {
-                eprintln!("Error parsing lscpu: {}", err);
-            }
+        let lscpu_cmd = std::process::Command::new("lscpu").output();
+        if lscpu_cmd.is_ok() {
+            app.lscpu = Some(String::from_utf8(lscpu_cmd.unwrap().stdout).unwrap());
+        } else if let Err(e) = lscpu_cmd {
+            app.lscpu = Some(fl!("error-occurred-with-msg", error = e.to_string()));
+            error!("lscpu command failed: {}", e);
         }
 
-        let lspci_cmd = std::process::Command::new("lspci").output().unwrap();
-        match String::from_utf8(lspci_cmd.stdout) {
-            Ok(lspci) => app.lspci = Some(lspci),
-            Err(err) => {
-                eprintln!("Error parsing lspci: {}", err);
-            }
+        let lspci_cmd = std::process::Command::new("lspci").output();
+        if lspci_cmd.is_ok() {
+            app.lspci = Some(String::from_utf8(lspci_cmd.unwrap().stdout).unwrap());
+        } else if let Err(e) = lspci_cmd {
+            app.lspci = Some(fl!("error-occurred-with-msg", error = e.to_string()));
+            error!("lspci command failed: {}", e);
         }
 
-        let lsusb_cmd = std::process::Command::new("lsusb").output().unwrap();
-        match String::from_utf8(lsusb_cmd.stdout) {
-            Ok(lsusb) => app.lsusb = Some(lsusb),
-            Err(err) => {
-                eprintln!("Error parsing lsusb: {}", err);
-            }
+        let lsusb_cmd = std::process::Command::new("lsusb").output();
+        if lsusb_cmd.is_ok() {
+            app.lsusb = Some(String::from_utf8(lsusb_cmd.unwrap().stdout).unwrap());
+        } else if let Err(e) = lsusb_cmd {
+            app.lsusb = Some(fl!("error-occurred-with-msg", error = e.to_string()));
+            error!("lsusb command failed: {}", e);
         }
 
         let command = app.update_title();
@@ -356,57 +357,84 @@ impl Application for AppModel {
             }
             Some(Page::Processor) => {
                 let Some(lscpu) = &self.lscpu else {
-                    return widget::text::title1(fl!("something-went-wrong")).into();
+                    return widget::text::title1(fl!("error-occurred")).into();
                 };
-                let lscpu = lscpu
-                    .lines()
-                    .map(|line: &str| {
-                        let (prefix, suffix) = line.split_once(":").unwrap();
-                        settings::item(prefix, widget::text::body(suffix)).into()
-                    })
-                    .collect::<Vec<Element<Message>>>();
 
-                let mut section = list_column();
-                for item in lscpu {
-                    section = section.add(item);
+                if let Some(lscpu_str) = &self.lscpu {
+                    if lscpu_str.starts_with(fl!("error-occurred").as_str()) {
+                        return widget::text::title1(lscpu_str).into();
+                    } else {
+                        let lscpu = lscpu
+                            .lines()
+                            .map(|line: &str| {
+                                let (prefix, suffix) = line.split_once(':').unwrap();
+                                settings::item(prefix, widget::text::body(suffix)).into()
+                            })
+                            .collect::<Vec<Element<Message>>>();
+
+                        let mut section = list_column();
+                        for item in lscpu {
+                            section = section.add(item);
+                        }
+                        return section.apply(widget::scrollable).into()
+                    }
+                } else {
+                    return widget::text::title1(fl!("error-occurred")).into();
                 }
-                section.apply(widget::scrollable).into()
             }
-            Some(Page::PCI) => {
+            Some(Page::PCIs) => {
                 let Some(lspci) = &self.lspci else {
-                    return widget::text::title1(fl!("something-went-wrong")).into();
+                    return widget::text::title1(fl!("error-occurred")).into();
                 };
-                let lspci = lspci
-                    .lines()
-                    .map(|line: &str| {
-                        let (prefix, suffix) = line.split_once(": ").unwrap();
-                        settings::item(suffix, widget::text::body(prefix)).into()
-                    })
-                    .collect::<Vec<Element<Message>>>();
 
-                let mut section = list_column();
-                for item in lspci {
-                    section = section.add(item);
+                if let Some(lspci_str) = &self.lspci {
+                    if lspci_str.starts_with(fl!("error-occurred").as_str()) {
+                        return widget::text::title1(lspci_str).into();
+                    } else {
+                        let lspci = lspci
+                            .lines()
+                            .map(|line: &str| {
+                                let (prefix, suffix) = line.split_once(": ").unwrap();
+                                settings::item(suffix, widget::text::body(prefix)).into()
+                            })
+                            .collect::<Vec<Element<Message>>>();
+
+                        let mut section = list_column();
+                        for item in lspci {
+                            section = section.add(item);
+                        }
+                        return section.apply(widget::scrollable).into()
+                    }
+                } else {
+                    return widget::text::title1(fl!("error-occurred")).into();
                 }
-                section.apply(widget::scrollable).into()
             }
-            Some(Page::USB) => {
+            Some(Page::USBs) => {
                 let Some(lsusb) = &self.lsusb else {
-                    return widget::text::title1(fl!("something-went-wrong")).into();
+                    return widget::text::title1(fl!("error-occurred")).into();
                 };
-                let lsusb = lsusb
-                    .lines()
-                    .map(|line: &str| {
-                        let (prefix, suffix) = line.split_once(": ").unwrap();
-                        settings::item(suffix, widget::text::body(prefix)).into()
-                    })
-                    .collect::<Vec<Element<Message>>>();
 
-                let mut section = list_column();
-                for item in lsusb {
-                    section = section.add(item);
+                if let Some(lsusb_str) = &self.lsusb {
+                    if lsusb_str.starts_with(fl!("error-occurred").as_str()) {
+                        return widget::text::title1(lsusb_str).into();
+                    } else {
+                        let lsusb = lsusb
+                            .lines()
+                            .map(|line: &str| {
+                                let (prefix, suffix) = line.split_once(": ").unwrap();
+                                settings::item(suffix, widget::text::body(prefix)).into()
+                            })
+                            .collect::<Vec<Element<Message>>>();
+
+                        let mut section = list_column();
+                        for item in lsusb {
+                            section = section.add(item);
+                        }
+                        return section.apply(widget::scrollable).into()
+                    }
+                } else {
+                    return widget::text::title1(fl!("error-occurred")).into();
                 }
-                section.apply(widget::scrollable).into()
             }
             None => widget::text::title1(fl!("no-page")).into(),
         };
@@ -509,8 +537,8 @@ impl AppModel {
 pub enum Page {
     Distribution,
     Processor,
-    PCI,
-    USB,
+    PCIs,
+    USBs,
 }
 
 /// The context page to display in the context drawer.

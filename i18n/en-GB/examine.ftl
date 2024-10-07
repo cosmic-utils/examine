@@ -1,6 +1,7 @@
 # General
 app-title = Examine
 about = About
+git-description = Git commit {$hash} on {$date}
 view = View
 no-page = Select a Page
 distribution = Distribution

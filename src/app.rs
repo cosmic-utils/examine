@@ -11,7 +11,7 @@ use etc_os_release::OsRelease;
 use futures_util::SinkExt;
 use itertools::Itertools;
 use std::{collections::HashMap, fs, path::PathBuf, str::FromStr};
-use log::error;
+use log::{error, warn};
 
 const REPOSITORY: &str = "https://github.com/cosmic-utils/examine";
 const APP_ICON: &[u8] =
@@ -30,7 +30,7 @@ pub struct AppModel {
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    OpenRepositoryUrl,
+    LaunchUrl(String),
     SubscriptionChannel,
     ToggleContextPage(ContextPage),
     UpdateConfig(Config),
@@ -466,8 +466,11 @@ impl Application for AppModel {
 
     fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
         match message {
-            Message::OpenRepositoryUrl => {
-                _ = open::that_detached(REPOSITORY);
+            Message::LaunchUrl(url) => match open::that_detached(&url) {
+                Ok(()) => {}
+                Err(err) => {
+                    warn!("failed to open {:?}: {}", url, err);
+                }
             }
 
             Message::SubscriptionChannel => {
@@ -502,19 +505,29 @@ impl AppModel {
     /// The about page for this app.
     pub fn about(&self) -> Element<Message> {
         let cosmic_theme::Spacing { space_xxs, .. } = theme::active().cosmic().spacing;
-
         let icon = widget::svg(widget::svg::Handle::from_memory(APP_ICON));
-
         let title = widget::text::title3(fl!("app-title"));
+        let hash = env!("VERGEN_GIT_SHA");
+        let short_hash: String = hash.chars().take(7).collect();
+        let date = env!("VERGEN_GIT_COMMIT_DATE");
 
-        let link = widget::button::link(REPOSITORY)
-            .on_press(Message::OpenRepositoryUrl)
+        let repo = widget::button::link(REPOSITORY)
+            .on_press(Message::LaunchUrl(REPOSITORY.to_string()))
+            .padding(0);
+
+        let commit = widget::button::link(fl!(
+                "git-description",
+                hash = short_hash.as_str(),
+                date = date
+            ))
+            .on_press(Message::LaunchUrl(format!("{REPOSITORY}/commits/{hash}")))
             .padding(0);
 
         widget::column()
             .push(icon)
             .push(title)
-            .push(link)
+            .push(repo)
+            .push(commit)
             .align_items(Alignment::Center)
             .spacing(space_xxs)
             .into()

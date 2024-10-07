@@ -4,7 +4,9 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-only</project_license>
   <project_group>COSMIC</project_group>
-  <developer_name>Dexter Reed</developer_name>
+  <developer id="page.codeberg.sungsphinx">
+    <name>Dexter Reed</name>
+  </developer>
   <update_contact>dreed4470@proton.me</update_contact>
   <url type="homepage">https://github.com/cosmic-utils/examine</url>
   <url type="bugtracker">https://github.com/cosmic-utils/examine/issues</url>
@@ -16,15 +18,40 @@
   <launchable type="desktop-id">page.codeberg.sungsphinx.Examine.desktop</launchable>
   <icon type="remote" height="256" width="256">https://raw.githubusercontent.com/cosmic-utils/examine/main/res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg</icon>
   <screenshots>
+    <screenshot type="default">
+      <caption>Distribution Page</caption>
+      <image type="source" width="1024" height="656">https://raw.githubusercontent.com/cosmic-utils/examine/refs/heads/main/res/screenshots/distribution.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>USBs Page</caption>
+      <image type="source" width="1024" height="656">https://raw.githubusercontent.com/cosmic-utils/examine/refs/heads/main/res/screenshots/usb-devices.png</image>
+    </screenshot>
   </screenshots>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </supports>
   <categories>
     <category>Utility</category>
     <category>System</category>
   </categories>
+  <content_rating type="oars-1.1"/>
   <provides>
     <id>com.system76.CosmicApplication</id>
-    <binaries>
-      <binary>examine</binary>
-    </binaries>
+    <binary>examine</binary>
   </provides>
+  <releases>
+    <release version="1.0.0" date="2024-10-07">
+      <description>
+        <p>Initial release of Examine</p>
+        <ul>
+          <li>View info about your distribution/os, processor, and more</li>
+        </ul>
+        <p>If you find any bugs or you want to request a feature, make sure to create an issue on the issue tracker!</p>
+      </description>
+    </release>
+  </releases>
 </component>

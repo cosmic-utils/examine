@@ -12,7 +12,7 @@
         "--share=ipc",
         "--socket=wayland",
         "--socket=fallback-x11",
-        "--device=dri",
+        "--device=all",
         "--talk-name=com.system76.CosmicSettingsDaemon",
         "--filesystem=xdg-config/cosmic:ro"
     ],
@@ -56,6 +56,68 @@
                     "only_arches": [
                         "aarch64"
                     ]
+                }
+            ]
+        },
+        {
+            "name": "pop-icon-theme",
+            "buildsystem": "meson",
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/pop-os/icon-theme/archive/refs/tags/v3.5.1.tar.gz",
+                    "sha256": "92e73f252e5e9c8a1124623a7d421410ef43c798a4a992955e6eb4f666f5c8a0"
+                }
+            ]
+        },
+        {
+            "name": "cosmic-icons",
+            "buildsystem": "simple",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/pop-os/cosmic-icons.git",
+                    "commit": "3fdc2175c145e00d798f98e81d5c4d493f0a2a8c"
+                }
+            ],
+            "build-commands": [
+                "just prefix=/app install"
+            ]
+        },
+	{
+            "name": "libusb",
+            "config-opts": [
+                "--disable-static"
+            ],
+            "cleanup": [
+                "/lib/*.la",
+                "/lib/pkgconfig",
+                "/include"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/libusb/libusb/releases/download/v1.0.27/libusb-1.0.27.tar.bz2",
+                    "sha256": "ffaa41d741a8a3bee244ac8e54a72ea05bf2879663c098c82fc5757853441575"
+                }
+            ]
+        },
+        {
+            "name": "usbutils",
+            "config-opts": [
+                "--datadir=/app/share/hwdata",
+                "--sbindir=/app/bin"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/gregkh/usbutils.git",
+                    "tag": "v017",
+                    "commit": "23077bf82534baad8adfe33ce4c02b5fb087eb86",
+                    "x-checker-data": {
+                        "type": "git",
+                        "tag-pattern": "^v([\\d.]+)$"
+                    }
                 }
             ]
         },

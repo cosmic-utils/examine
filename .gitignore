@@ -1,4 +1,6 @@
 .cargo/
+.flatpak-builder/
+*.flatpak
 *.pdb
 **/*.rs.bk
 debug/

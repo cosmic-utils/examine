@@ -6,9 +6,11 @@ no-page = Select a Page
 distribution = Distribution
 processor = Processor
 pci-devices = PCIs
+usb-devices = USBs
 not-provided = Not Provided
 wip = Work in Progress
-something-went-wrong = Uh oh, something went wrong!
+error-occurred = An error occurred
+error-occurred-with-msg = An error occurred: {$error}
 
 # Distribution Page
 pretty-name = Pretty Name

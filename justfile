@@ -74,6 +74,10 @@ flatpak:
     install -Dm0644 {{desktop-src}} {{flatpak-desktop-dst}}
     install -Dm0644 {{icon-src}} {{flatpak-icon-dst}}
 
+# Generate cargo-sources.json file for Flatpak
+flatpak-cargo-generator:
+    python3 ./aux/fcg.py Cargo.lock -o cargo-sources.json
+
 # Uninstalls installed files
 uninstall:
     rm {{bin-dst}} {{desktop-dst}} {{icon-dst}}

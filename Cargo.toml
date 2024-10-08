@@ -25,6 +25,9 @@ git = "https://github.com/pop-os/libcosmic.git"
 default-features = false
 features = ["tokio", "winit"]
 
+[build-dependencies]
+vergen = { version = "8", features = ["git", "gitcl"] }
+
 [features]
 default = ["wgpu"]
 wgpu = ["libcosmic/wgpu"]

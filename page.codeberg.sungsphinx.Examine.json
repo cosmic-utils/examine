@@ -2,6 +2,8 @@
     "id": "page.codeberg.sungsphinx.Examine",
     "runtime": "org.freedesktop.Platform",
     "runtime-version": "24.08",
+    "base": "com.system76.Cosmic.BaseApp",
+    "base-version": "stable",
     "sdk": "org.freedesktop.Sdk",
     "sdk-extensions": [
         "org.freedesktop.Sdk.Extension.rust-stable",
@@ -57,31 +59,6 @@
                         "aarch64"
                     ]
                 }
-            ]
-        },
-        {
-            "name": "pop-icon-theme",
-            "buildsystem": "meson",
-            "sources": [
-                {
-                    "type": "archive",
-                    "url": "https://github.com/pop-os/icon-theme/archive/refs/tags/v3.5.1.tar.gz",
-                    "sha256": "92e73f252e5e9c8a1124623a7d421410ef43c798a4a992955e6eb4f666f5c8a0"
-                }
-            ]
-        },
-        {
-            "name": "cosmic-icons",
-            "buildsystem": "simple",
-            "sources": [
-                {
-                    "type": "git",
-                    "url": "https://github.com/pop-os/cosmic-icons.git",
-                    "commit": "3fdc2175c145e00d798f98e81d5c4d493f0a2a8c"
-                }
-            ],
-            "build-commands": [
-                "just prefix=/app install"
             ]
         },
 	{

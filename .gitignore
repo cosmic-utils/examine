@@ -1,5 +1,8 @@
 .cargo/
 .flatpak-builder/
+build-dir/
+cargo-sources.json
+repo/
 *.flatpak
 *.pdb
 **/*.rs.bk

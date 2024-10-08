@@ -1,6 +1,6 @@
 <div align="center">
   <br>
-  <img src="res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg" width="150" />
+  <img src="res/icons/hicolor/scalable/apps/io.github.cosmic_utils.Examine.svg" width="150" />
   <h1>Examine</h1>
 
   <p>A system information viewer for the COSMIC™ Desktop</p>

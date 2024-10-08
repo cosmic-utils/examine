@@ -4,6 +4,6 @@ Exec=examine %F
 Terminal=false
 Type=Application
 StartupNotify=true
-Icon=page.codeberg.sungsphinx.Examine
+Icon=io.github.cosmic_utils.Examine
 Categories=Utility;System;
 Keywords=CPU;Processor;Distribution;USB;PCI;Information;System;About;

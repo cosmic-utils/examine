@@ -1,5 +1,5 @@
 {
-    "id": "page.codeberg.sungsphinx.Examine",
+    "id": "io.github.cosmic_utils.Examine",
     "runtime": "org.freedesktop.Platform",
     "runtime-version": "24.08",
     "base": "com.system76.Cosmic.BaseApp",

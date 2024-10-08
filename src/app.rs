@@ -15,7 +15,7 @@ use log::{error, warn};
 
 const REPOSITORY: &str = "https://github.com/cosmic-utils/examine";
 const APP_ICON: &[u8] =
-    include_bytes!("../res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg");
+    include_bytes!("../res/icons/hicolor/scalable/apps/io.github.cosmic_utils.Examine.svg");
 
 pub struct AppModel {
     core: Core,
@@ -43,7 +43,7 @@ impl Application for AppModel {
 
     type Message = Message;
 
-    const APP_ID: &'static str = "page.codeberg.sungsphinx.Examine";
+    const APP_ID: &'static str = "io.github.cosmic_utils.Examine";
 
     fn core(&self) -> &Core {
         &self.core

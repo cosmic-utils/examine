@@ -1,5 +1,5 @@
 name := 'examine'
-appid := 'page.codeberg.sungsphinx.Examine'
+appid := 'io.github.cosmic_utils.Examine'
 
 rootdir := ''
 prefix := '/usr'
@@ -19,8 +19,8 @@ flatpak-desktop-dst := clean(rootdir / flatpak-prefix) / 'share' / 'applications
 
 metainfo := appid + '.metainfo.xml'
 metainfo-src := 'res' / metainfo
-metainfo-dst := clean(rootdir / prefix) / 'share' / 'applications' / desktop
-flatpak-metainfo-dst := clean(rootdir / flatpak-prefix) / 'share' / 'applications' / desktop
+metainfo-dst := clean(rootdir / prefix) / 'share' / 'applications' / metainfo
+flatpak-metainfo-dst := clean(rootdir / flatpak-prefix) / 'share' / 'applications' / metainfo
 
 icon := appid + '.svg'
 icon-src := 'res' / 'icons' / 'hicolor' / 'scalable' / 'apps' / icon
@@ -66,12 +66,14 @@ run *args:
 install:
     install -Dm0755 {{bin-src}} {{bin-dst}}
     install -Dm0644 {{desktop-src}} {{desktop-dst}}
+    install -Dm0644 {{metainfo-src}} {{metainfo-dst}}
     install -Dm0644 {{icon-src}} {{icon-dst}}
 
 # Installs files (Flatpak)
 flatpak:
     install -Dm0755 {{bin-src}} {{flatpak-bin-dst}}
     install -Dm0644 {{desktop-src}} {{flatpak-desktop-dst}}
+    install -Dm0644 {{metainfo-src}} {{flatpak-metainfo-dst}}
     install -Dm0644 {{icon-src}} {{flatpak-icon-dst}}
 
 # Generate cargo-sources.json file for Flatpak

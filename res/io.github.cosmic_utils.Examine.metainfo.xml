@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>page.codeberg.sungsphinx.Examine</id>
+  <id>io.github.cosmic_utils.Examine</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-only</project_license>
   <project_group>COSMIC</project_group>
@@ -15,8 +15,8 @@
   <description>
     <p>Examine is an app which gives you easy access to system information without needing to use the terminal, built for the COSMIC™ desktop.</p>
   </description>
-  <launchable type="desktop-id">page.codeberg.sungsphinx.Examine.desktop</launchable>
-  <icon type="remote" height="256" width="256">https://raw.githubusercontent.com/cosmic-utils/examine/main/res/icons/hicolor/scalable/apps/page.codeberg.sungsphinx.Examine.svg</icon>
+  <launchable type="desktop-id">io.github.cosmic_utils.Examine.desktop</launchable>
+  <icon type="remote" height="256" width="256">https://raw.githubusercontent.com/cosmic-utils/examine/main/res/icons/hicolor/scalable/apps/io.github.cosmic_utils.Examine.svg</icon>
   <screenshots>
     <screenshot type="default">
       <caption>Distribution Page</caption>

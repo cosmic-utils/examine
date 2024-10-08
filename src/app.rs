@@ -5,6 +5,7 @@ use crate::fl;
 use cosmic::app::{Command, Core};
 use cosmic::cosmic_config::{self, CosmicConfigEntry};
 use cosmic::iced::{Alignment, Length, Subscription};
+use cosmic::iced_winit::winit::window::WindowId;
 use cosmic::widget::{self, icon, list_column, menu, nav_bar, row, settings};
 use cosmic::{cosmic_theme, theme, Application, ApplicationExt, Apply, Element};
 use etc_os_release::OsRelease;
@@ -23,6 +24,7 @@ pub struct AppModel {
     nav: nav_bar::Model,
     key_binds: HashMap<menu::KeyBind, MenuAction>,
     config: Config,
+    dmidecode: Option<String>,
     lscpu: Option<String>,
     lspci: Option<String>,
     lsusb: Option<String>,
@@ -63,6 +65,12 @@ impl Application for AppModel {
             .activate();
 
         nav.insert()
+            .text(fl!("motherboard"))
+            .data::<Page>(Page::Motherboard)
+            .icon(icon::from_name("applications-system-symbolic"))
+            .activate();
+
+        nav.insert()
             .text(fl!("processor"))
             .data::<Page>(Page::Processor)
             .icon(icon::from_name("system-run-symbolic"));
@@ -88,10 +96,19 @@ impl Application for AppModel {
                     Err((_errors, config)) => config,
                 })
                 .unwrap_or_default(),
+            dmidecode: None,
             lscpu: None,
             lspci: None,
             lsusb: None,
         };
+
+        let dmidecode_cmd = std::process::Command::new("dmidecode -t baseboard").output();
+        if dmidecode_cmd.is_ok() {
+            app.dmidecode = Some(String::from_utf8(dmidecode_cmd.unwrap().stdout).unwrap());
+        } else if let Err(e) = dmidecode_cmd {
+            app.dmidecode = Some(fl!("error-occurred-with-msg", error = e.to_string()));
+            error!("dmidecode command failed: {}", e);
+        }
 
         let lscpu_cmd = std::process::Command::new("lscpu").output();
         if lscpu_cmd.is_ok() {
@@ -355,6 +372,33 @@ impl Application for AppModel {
                     .height(Length::Fill)
                     .into()
             }
+            Some(Page::Motherboard) => {
+                let Some(dmidecode) = &self.dmidecode else {
+                    return widget::text::title1(fl!("error-occurred")).into();
+                };
+
+                if let Some(dmidecode_str) = &self.dmidecode {
+                    if dmidecode_str.starts_with(fl!("error-occurred").as_str()) {
+                        return widget::text::title1(dmidecode_str).into();
+                    } else {
+                        let dmidecode = dmidecode
+                            .lines()
+                            .map(|line: &str| {
+                                let (prefix, suffix) = line.split_once(':').unwrap();
+                                settings::item(prefix, widget::text::body(suffix)).into()
+                            })
+                            .collect::<Vec<Element<Message>>>();
+
+                        let mut section = list_column();
+                        for item in dmidecode {
+                            section = section.add(item);
+                        }
+                        return section.apply(widget::scrollable).into()
+                    }
+                } else {
+                    return widget::text::title1(fl!("error-occurred")).into();
+                }
+            }
             Some(Page::Processor) => {
                 let Some(lscpu) = &self.lscpu else {
                     return widget::text::title1(fl!("error-occurred")).into();
@@ -549,6 +593,7 @@ impl AppModel {
 /// The page to display in the application.
 pub enum Page {
     Distribution,
+    Motherboard,
     Processor,
     PCIs,
     USBs,

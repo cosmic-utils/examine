@@ -5,6 +5,7 @@ git-description = Git commit {$hash} on {$date}
 view = View
 no-page = Select a Page
 distribution = Distribution
+motherboard = Motherboard
 processor = Processor
 pci-devices = PCIs
 usb-devices = USBs

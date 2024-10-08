@@ -19,8 +19,8 @@ flatpak-desktop-dst := clean(rootdir / flatpak-prefix) / 'share' / 'applications
 
 metainfo := appid + '.metainfo.xml'
 metainfo-src := 'res' / metainfo
-metainfo-dst := clean(rootdir / prefix) / 'share' / 'applications' / metainfo
-flatpak-metainfo-dst := clean(rootdir / flatpak-prefix) / 'share' / 'applications' / metainfo
+metainfo-dst := clean(rootdir / prefix) / 'share' / 'metainfo' / metainfo
+flatpak-metainfo-dst := clean(rootdir / flatpak-prefix) / 'share' / 'metainfo' / metainfo
 
 icon := appid + '.svg'
 icon-src := 'res' / 'icons' / 'hicolor' / 'scalable' / 'apps' / icon

@@ -1,5 +1,5 @@
 name := 'examine'
-appid := 'page.codeberg.sungsphinx.Examine'
+appid := 'io.github.cosmic_utils.Examine'
 
 rootdir := ''
 prefix := '/usr'

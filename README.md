@@ -8,10 +8,6 @@
   <img src="res/screenshots/distribution.png"/>
 </div>
 
-## Todo
-- [ ] Show lines separately/in rows using cards/widgets and not a text widget (Distribution page completed)
-- [ ] More pages
-
 ## Install
 
 To install Examine, you will need [just](https://github.com/casey/just), if you're on Pop!\_OS, you can install it with the following command:

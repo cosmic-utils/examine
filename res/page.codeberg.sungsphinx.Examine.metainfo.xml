@@ -44,7 +44,7 @@
     <binary>examine</binary>
   </provides>
   <releases>
-    <release version="1.0.0" date="2024-10-07">
+    <release version="1.0.0" date="2024-10-08">
       <description>
         <p>Initial release of Examine</p>
         <ul>

@@ -1,0 +1,42 @@
+# Allmänt
+app-title = Examine
+about = Om
+git-description = Git commit {$hash} på {$date}
+view = Visa
+no-page = Välj en sida
+distribution = Distribution
+processor = Processor
+pci-devices = PCI enheter
+usb-devices = USB enheter
+not-provided = Tillhandahålls inte
+wip = Pågående arbete
+error-occurred = Ett fel har uppstått
+error-occurred-with-msg = Ett fel har uppstått: {$error}
+
+# Distributionssida
+pretty-name = Vackert namn
+name = Namn
+id = ID
+id-like = ID som
+version = Version
+version-id = Versions-ID
+version-codename = Versionens kodnamn
+build-id = Bygg-ID
+image-id = Avbilds-ID
+image-version = Avbilds-version
+vendor-name = Leverantörs namn
+ansi-color = ANSI färg
+logo = Logotyp
+cpe-name = CPE-namn
+home-url = Home-URL
+vendor-url = Leverantörs-URL
+doc-url = Dokumentation-URL
+support-url = Support-URL
+bug-report-url = Bugg rapport-URL
+privacy-policy-url = Sekretesspolicy-URL
+support-end = Support upphör
+variant = Variant
+variant-id = Variant-ID
+default-hostname = Standard värdnamn
+arch = Arkitektur
+portable-prefixes = Portabla Prefix

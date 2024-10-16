@@ -10,6 +10,10 @@
   <update_contact>dreed4470@proton.me</update_contact>
   <url type="homepage">https://github.com/cosmic-utils/examine</url>
   <url type="bugtracker">https://github.com/cosmic-utils/examine/issues</url>
+  <url type="vcs-browser">https://github.com/cosmic-utils/examine</url>
+  <url type="translate">https://github.com/cosmic-utils/examine/tree/main/i18n</url>
+  <url type="contact">https://sungsphinx.codeberg.page/</url>
+  <url type="contribute">https://github.com/cosmic-utils/examine</url>
   <name>Examine</name>
   <summary>View system information</summary>
   <description>
@@ -27,6 +31,10 @@
       <image type="source" width="1024" height="656">https://raw.githubusercontent.com/cosmic-utils/examine/refs/heads/main/res/screenshots/usb-devices.png</image>
     </screenshot>
   </screenshots>
+  <branding>
+    <color type="primary" scheme_preference="light">#9cc8d7</color>
+    <color type="primary" scheme_preference="dark">#39697c</color>
+  </branding>
   <requires>
     <display_length compare="ge">360</display_length>
   </requires>

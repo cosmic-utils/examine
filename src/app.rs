@@ -252,37 +252,37 @@ impl Application for AppModel {
                 if let Ok(Some(home_url)) = osrelease.home_url() {
                     list = list.add(settings::item(
                         fl!("home-url"),
-                        widget::text::body(home_url.to_string()),
+                        widget::button::link(home_url.to_string()).on_press(Message::LaunchUrl(home_url.to_string())),
                     ));
                 }
                 if let Ok(Some(support_url)) = osrelease.support_url() {
                     list = list.add(settings::item(
                         fl!("vendor-url"),
-                        widget::text::body(support_url.to_string()),
+                        widget::button::link(support_url.to_string()).on_press(Message::LaunchUrl(support_url.to_string())),
                     ));
                 }
                 if let Ok(Some(documentation_url)) = osrelease.documentation_url() {
                     list = list.add(settings::item(
                         fl!("doc-url"),
-                        widget::text::body(documentation_url.to_string()),
+                        widget::button::link(documentation_url.to_string()).on_press(Message::LaunchUrl(documentation_url.to_string())),
                     ));
                 }
                 if let Ok(Some(support_url)) = osrelease.support_url() {
                     list = list.add(settings::item(
                         fl!("support-url"),
-                        widget::text::body(support_url.to_string()),
+                        widget::button::link(support_url.to_string()).on_press(Message::LaunchUrl(support_url.to_string())),
                     ));
                 }
                 if let Ok(Some(bug_report_url)) = osrelease.bug_report_url() {
                     list = list.add(settings::item(
                         fl!("bug-report-url"),
-                        widget::text::body(bug_report_url.to_string()),
+                        widget::button::link(bug_report_url.to_string()).on_press(Message::LaunchUrl(bug_report_url.to_string())),
                     ));
                 }
                 if let Ok(Some(privacy_policy_url)) = osrelease.privacy_policy_url() {
                     list = list.add(settings::item(
                         fl!("privacy-policy-url"),
-                        widget::text::body(privacy_policy_url.to_string()),
+                        widget::button::link(privacy_policy_url.to_string()).on_press(Message::LaunchUrl(privacy_policy_url.to_string())),
                     ));
                 }
                 if let Some(support_end) = osrelease.support_end().unwrap_or_default().take() {

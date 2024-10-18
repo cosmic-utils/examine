@@ -2,9 +2,9 @@
 
 use crate::config::Config;
 use crate::fl;
-use cosmic::app::{Command, Core};
+use cosmic::app::{Core, Task};
 use cosmic::cosmic_config::{self, CosmicConfigEntry};
-use cosmic::iced::{Alignment, Length, Subscription};
+use cosmic::iced::{stream, Subscription, alignment, Alignment, Length};
 use cosmic::widget::{self, icon, list_column, menu, nav_bar, row, settings};
 use cosmic::{cosmic_theme, theme, Application, ApplicationExt, Apply, Element};
 use etc_os_release::OsRelease;
@@ -53,7 +53,7 @@ impl Application for AppModel {
         &mut self.core
     }
 
-    fn init(core: Core, _flags: Self::Flags) -> (Self, Command<Self::Message>) {
+    fn init(core: Core, _flags: Self::Flags) -> (Self, Task<Self::Message>) {
         let mut nav = nav_bar::Model::default();
 
         nav.insert()
@@ -239,7 +239,7 @@ impl Application for AppModel {
                         row::with_capacity(2)
                             .push(icon::from_name(logo.to_string()))
                             .push(widget::text::body(logo.to_string()))
-                            .align_items(Alignment::Center)
+                            .align_y(Alignment::Center)
                             .spacing(spacing.space_xxxs),
                     ));
                 }
@@ -449,14 +449,13 @@ impl Application for AppModel {
         struct MySubscription;
 
         Subscription::batch(vec![
-            cosmic::iced::subscription::channel(
+            Subscription::run_with_id(
                 std::any::TypeId::of::<MySubscription>(),
-                4,
-                move |mut channel| async move {
+                stream::channel(4, move |mut channel| async move {
                     _ = channel.send(Message::SubscriptionChannel).await;
 
                     futures_util::future::pending().await
-                },
+                }),
             ),
             self.core()
                 .watch_config::<Config>(Self::APP_ID)
@@ -464,7 +463,7 @@ impl Application for AppModel {
         ])
     }
 
-    fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
+    fn update(&mut self, message: Self::Message) -> Task<Self::Message> {
         match message {
             Message::LaunchUrl(url) => match open::that_detached(&url) {
                 Ok(()) => {}
@@ -492,10 +491,10 @@ impl Application for AppModel {
                 self.config = config;
             }
         }
-        Command::none()
+        Task::none()
     }
 
-    fn on_nav_select(&mut self, id: nav_bar::Id) -> Command<Self::Message> {
+    fn on_nav_select(&mut self, id: nav_bar::Id) -> Task<Self::Message> {
         self.nav.activate(id);
         self.update_title()
     }
@@ -528,13 +527,13 @@ impl AppModel {
             .push(title)
             .push(repo)
             .push(commit)
-            .align_items(Alignment::Center)
+            .align_x(alignment::Horizontal::Center)
             .spacing(space_xxs)
             .into()
     }
 
     /// Updates the header and window titles.
-    pub fn update_title(&mut self) -> Command<Message> {
+    pub fn update_title(&mut self) -> Task<Message> {
         let mut window_title = fl!("app-title");
 
         if let Some(page) = self.nav.text(self.nav.active()) {

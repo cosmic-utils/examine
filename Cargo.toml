@@ -29,8 +29,9 @@ features = ["tokio", "winit"]
 vergen = { version = "8", features = ["git", "gitcl"] }
 
 [features]
-default = ["wgpu"]
+default = ["dbus-config", "wgpu"]
 wgpu = ["libcosmic/wgpu"]
+dbus-config = ["libcosmic/dbus-config"]
 
 # Uncomment to test a locally-cloned libcosmic
 # [patch.'https://github.com/pop-os/libcosmic']

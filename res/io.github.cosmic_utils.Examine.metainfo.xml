@@ -5,6 +5,7 @@
   <name>Examine</name>
   <summary>View system information</summary>
   <summary xml:lang="cs">Získejte informace o systému</summary>
+  <summary xml:lang="fr">Afficher les informations système</summary>
   <summary xml:lang="hu">Rendszerinformációk megtekintése</summary>
   <summary xml:lang="uk">Перегляд системної інформації</summary>  
   <developer id="page.codeberg.sungsphinx">
@@ -17,6 +18,7 @@
   <description>
     <p>Examine is an app which gives you easy access to system information without needing to use the terminal, built for the COSMIC™ desktop.</p>
     <p xml:lang="cs">Examine je aplikace, která vám poskytne jednoduchý přístup k systémovým informacím bez potřeby příkazového řádku, postavená pro prostředí COSMIC™.</p>
+    <p xml:lang="fr">Examine est une application qui vous permet d'accéder facilement aux informations système sans avoir besoin d'utiliser le terminal, conçue pour le bureau COSMIC™.</p>
     <p xml:lang="hu">Az Examine egy alkalmazás, amely egyszerű hozzáférést biztosít a rendszerinformációkhoz terminál használata nélkül, a COSMIC™ asztali környezetre tervezve.</p>
     <p xml:lang="uk">Examine швидко показує ключові параметри вашої системи — дистрибутив, процесор та інші характеристики, без відкриття терміналу. Створено для COSMIC™.</p>
   </description>
@@ -24,6 +26,7 @@
     <screenshot type="default">
       <caption>Distribution Page</caption>
       <caption xml:lang="cs">Stránka Distribuce</caption>
+      <caption xml:lang="fr">Page de la distribution</caption>
       <caption xml:lang="hu">Disztribúció oldal</caption>
       <caption xml:lang="uk">Сторінка дистрибутива</caption>
       <image type="source" width="1024" height="656">https://raw.githubusercontent.com/cosmic-utils/examine/refs/heads/main/res/screenshots/distribution.png</image>
@@ -31,12 +34,26 @@
     <screenshot>
       <caption>USBs Page</caption>
       <caption xml:lang="cs">Stránka USB zařízení</caption>
+      <caption xml:lang="fr">Page des périphériques USB</caption>
       <caption xml:lang="hu">USB-eszközök oldal</caption>
       <caption xml:lang="uk">Сторінка USB-пристроїв</caption>
       <image type="source" width="1024" height="656">https://raw.githubusercontent.com/cosmic-utils/examine/refs/heads/main/res/screenshots/usb-devices.png</image>
     </screenshot>
   </screenshots>
   <releases>
+    <release version="2.0.1" date="2026-04-05" type="stable">
+      <url>https://github.com/cosmic-utils/examine/releases/tag/2.0.1</url>
+      <description>
+        <p>Translations added (GitHub usernames in parentheses):</p>
+        <ul>
+          <li>Hungarian (@therealmate)</li>
+          <li>Czech (@lorduskordus)</li>
+          <li>Ukrainian (@Dymkom)</li>
+          <li>French (@ligenix)</li>
+        </ul>
+        <p>Thank you to everybody above!</p>
+      </description>
+    </release>
     <release version="2.0.0" date="2026-01-20" type="stable">
       <url>https://github.com/cosmic-utils/examine/releases/tag/2.0.0</url>
       <description>
@@ -54,7 +71,6 @@
           <li>Romanian (@mateipralea)</li>
           <li>Bulgarian (@twlvnn)</li>
           <li>Portuguese (@carvalhods)</li>
-          <li>Ukrainian (@dymko)</li>
         </ul>
         <p>Thank you to everybody who has contributed to this release, and apologies for the *very long* wait.</p>
         <p>I plan to work on this app more this year, but I will have to see where life decides to take me :-).</p>

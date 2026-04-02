@@ -41,6 +41,19 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="2.0.1" date="2026-04-05" type="stable">
+      <url>https://github.com/cosmic-utils/examine/releases/tag/2.0.1</url>
+      <description>
+        <p>Translations added (GitHub usernames in parentheses):</p>
+        <ul>
+          <li>Hungarian (@therealmate)</li>
+          <li>Czech (@lorduskordus)</li>
+          <li>Ukrainian (@Dymkom)</li>
+          <li>French (@ligenix)</li>
+        </ul>
+        <p>Thank you to everybody above!</p>
+      </description>
+    </release>
     <release version="2.0.0" date="2026-01-20" type="stable">
       <url>https://github.com/cosmic-utils/examine/releases/tag/2.0.0</url>
       <description>
@@ -58,14 +71,12 @@
           <li>Romanian (@mateipralea)</li>
           <li>Bulgarian (@twlvnn)</li>
           <li>Portuguese (@carvalhods)</li>
-          <li>Ukrainian (@dymko)</li>
-          <li>French (@ligenix)</li>
         </ul>
         <p>Thank you to everybody who has contributed to this release, and apologies for the *very long* wait.</p>
         <p>I plan to work on this app more this year, but I will have to see where life decides to take me :-).</p>
       </description>
     </release>
-    <release version="2.0.0" date="2026-01-20" type="stable">
+    <release version="1.0.0" date="2024-10-08" type="stable">
       <description>
         <p>Initial release of Examine</p>
         <ul>

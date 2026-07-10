@@ -13,6 +13,10 @@ wip = Pågående arbete
 error-occurred = Ett fel har uppstått
 error-occurred-with-msg = Ett fel har uppstått: {$error}
 
+# Om
+support = Support
+repository = Källkod
+
 # Distributionssida
 pretty-name = Vackert namn
 name = Namn

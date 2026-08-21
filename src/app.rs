@@ -3,6 +3,7 @@
 use crate::config::Config;
 use crate::fl;
 use crate::icons;
+use cosmic::iced::futures::channel::mpsc::Sender;
 use cosmic::app::{Core, Task, context_drawer};
 use cosmic::cosmic_config::{self, CosmicConfigEntry};
 use cosmic::iced::{stream, Subscription, Alignment, Length};
@@ -482,14 +483,13 @@ impl Application for AppModel {
         struct MySubscription;
 
         Subscription::batch(vec![
-            Subscription::run_with_id(
-                std::any::TypeId::of::<MySubscription>(),
-                stream::channel(4, move |mut channel| async move {
+            Subscription::run_with(std::any::TypeId::of::<MySubscription>(), |_| {
+                stream::channel(4, move |mut channel: Sender<Message>| async move {
                     _ = channel.send(Message::SubscriptionChannel).await;
 
                     futures_util::future::pending().await
-                }),
-            ),
+                })
+            }),
             self.core()
                 .watch_config::<Config>(Self::APP_ID)
                 .map(|update| Message::UpdateConfig(update.config)),
@@ -546,7 +546,11 @@ impl AppModel {
             window_title.push_str(page);
         }
 
-        self.set_window_title(window_title.to_string())
+        if let Some(window_id) = self.core.main_window_id() {
+            self.set_window_title(window_title.to_string(), window_id)
+        } else {
+            Task::none()
+        }
     }
 }
 

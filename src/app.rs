@@ -309,6 +309,7 @@ impl Application for AppModel {
                         row::with_capacity(2)
                             .push(icon::from_name(logo.to_string()))
                             .push(widget::text::body(logo.to_string()))
+                            .align_y(Alignment::Center)
                             .spacing(spacing.space_xxxs),
                     ).align_items(Alignment::Center));
                 }

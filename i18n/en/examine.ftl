@@ -1,7 +1,6 @@
 # General
 app-title = Examine
 about = About
-git-description = Git commit {$hash} on {$date}
 view = View
 no-page = Select a Page
 distribution = Distribution
@@ -10,6 +9,7 @@ pci-devices = PCIs
 usb-devices = USBs
 not-provided = Not Provided
 wip = Work in Progress
+error = Error
 error-occurred = An error has occurred
 error-occurred-with-msg = An error has occurred: {$error}
 

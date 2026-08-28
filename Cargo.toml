@@ -22,10 +22,11 @@ features = ["fluent-system", "desktop-requester"]
 [dependencies.libcosmic]
 git = "https://github.com/pop-os/libcosmic.git"
 default-features = false
-features = ["tokio", "winit", "wayland", "about"]
+features = ["tokio", "winit", "about"]
 
 [features]
-default = ["dbus-config", "wgpu", "xdg-portal"]
+default = ["wayland", "wgpu", "xdg-portal"]
+wayland = ["libcosmic/wayland"]
 wgpu = ["libcosmic/wgpu"]
 dbus-config = ["libcosmic/dbus-config"]
 xdg-portal = ["libcosmic/xdg-portal"]

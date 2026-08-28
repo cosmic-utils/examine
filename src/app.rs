@@ -451,7 +451,7 @@ impl Application for AppModel {
                             .lines()
                             .map(|line: &str| {
                                 let (prefix, suffix) = line.split_once(':').unwrap();
-                                settings::flex_item(prefix, widget::text::body(suffix)).align_items(Alignment::Center).into()
+                                settings::flex_item(prefix, widget::text::body(suffix.trim())).align_items(Alignment::Center).into()
                             })
                             .collect::<Vec<Element<Message>>>();
 
